@@ -16,6 +16,10 @@ public class LineChart extends View {
 
     private int backgroundColor = Color.LTGRAY;
     private float divider;
+
+    /**
+     * Change this value to show another line graph points
+     */
     private float MIN_VALUE = 100;
     private float MAX_VALUE = 110;
     private float W;
@@ -93,16 +97,12 @@ public class LineChart extends View {
         drawYAxis();
         drawXAxisText();
         drawYAxisText();
-        createPoint();
-
-        Log.i("DDDDD", "Invalid");
+        drawLineWithTwoPoint();
     }
 
-    public void recreate(){
-
-        invalidate();
-    }
-
+    /**
+     * Draw x and y axis line with each rect
+     */
     private void drawXYLine() {
         // Draw equal divider
         if (divider != 0) {
@@ -124,6 +124,10 @@ public class LineChart extends View {
         }
     }
 
+
+    /**
+     * Draw x axis line with text line
+     */
     private void drawXAxis() {
         // draw x-axis
         float EACH_SECTION_H = H / divider;
@@ -132,6 +136,10 @@ public class LineChart extends View {
         canvas.drawLine(0, H_X, W - EACH_SECTION_X, H_X, mXAxisPaint);
     }
 
+
+    /**
+     * Draw y axis line with text line
+     */
     private void drawYAxis() {
         // draw y-axis
         float EACH_SECTION_H = H / divider;
@@ -141,6 +149,9 @@ public class LineChart extends View {
         canvas.drawLine(W_Y, 0, W_Y, H - EACH_SECTION_H, mYAxisPaint);
     }
 
+    /**
+     * Draw x axis text 15.00 14.00 ...
+     */
     private void drawXAxisText() {
         DecimalFormat df = new DecimalFormat("#.00");
         float EACH_SECTION_H = H / divider;
@@ -154,6 +165,9 @@ public class LineChart extends View {
         }
     }
 
+    /**
+     * Draw y axis text 100.00 101.00
+     */
     private void drawYAxisText() {
         DecimalFormat df = new DecimalFormat("#.00");
         float EACH_SECTION_H = H / divider;
@@ -169,7 +183,10 @@ public class LineChart extends View {
         }
     }
 
-    private void createPoint() {
+    /**
+     * Draw line by line with adjacent
+     */
+    private void drawLineWithTwoPoint() {
         float EACH_SECTION_H = H / divider;
         float W_GAP = W / divider;
         float STARTX = 0;
@@ -187,4 +204,11 @@ public class LineChart extends View {
         }
     }
 
+    public void setMaxPoint(float max) {
+        MAX_VALUE = max;
+    }
+
+    public void setMinPoint(float min) {
+        MIN_VALUE = min;
+    }
 }

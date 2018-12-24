@@ -1,199 +1,109 @@
 package com.app.graph.line;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 public class LineChart extends View {
 
-    private Context context;
+    private int backgroundColor = Color.LTGRAY;
+    private float divider;
+    private float MIN_VALUE = 100;
+    private float MAX_VALUE = 110;
+    private float W;
+    private float H;
+    private Canvas canvas;
+    private Paint mXYLinePaint = new Paint();
+    private Paint mXAxisPaint = new Paint();
+    private Paint mYAxisPaint = new Paint();
+    private Paint mXAxisTextPaint = new Paint();
+    private Paint mYAxisTextPaint = new Paint();
+    private Paint mLinePaint = new Paint();
+
 
     public LineChart(Context context) {
         super(context);
         init();
-        this.context = context;
     }
 
     public LineChart(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         init();
-        this.context = context;
     }
 
     public LineChart(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
-        this.context = context;
     }
-
-
-    private int backgroundColor = Color.LTGRAY;
-    private float divider = 10;
-    private int xDivider = 10;
-    private int yDivider = 10;
-
-    private float W;
-    private float H;
-
-    Paint X_PAINT = new Paint();
-    Paint POINT_PAINT = new Paint();
-    Paint Y_AXIS_PAINT = new Paint();
 
     private void init() {
-        X_PAINT.setColor(Color.BLACK);
-        Y_AXIS_PAINT.setColor(Color.RED);
-        Y_AXIS_PAINT.setStrokeWidth(3);
+        mXYLinePaint.setColor(Color.BLACK);
+        mXYLinePaint.setStrokeWidth(1);
+        mXYLinePaint.setAntiAlias(true);
+        mXYLinePaint.setDither(true);
 
-        POINT_PAINT.setColor(Color.BLACK);
-        POINT_PAINT.setAntiAlias(true);
-        POINT_PAINT.setStrokeWidth(2);
+        mXAxisPaint.setColor(Color.RED);
+        mXAxisPaint.setStrokeWidth(2);
+        mXAxisPaint.setAntiAlias(true);
+        mXAxisPaint.setDither(true);
+
+        mYAxisPaint.setColor(Color.RED);
+        mYAxisPaint.setStrokeWidth(2);
+        mYAxisPaint.setAntiAlias(true);
+        mYAxisPaint.setDither(true);
+
+        mXAxisTextPaint.setColor(Color.RED);
+        mXAxisTextPaint.setAntiAlias(true);
+        mXAxisTextPaint.setStrokeWidth(2);
+        mXAxisTextPaint.setDither(true);
+        mXAxisTextPaint.setStyle(Paint.Style.FILL);
+
+        mYAxisTextPaint.setColor(Color.BLUE);
+        mYAxisTextPaint.setAntiAlias(true);
+        mYAxisTextPaint.setStrokeWidth(2);
+        mYAxisTextPaint.setDither(true);
+        mYAxisTextPaint.setStyle(Paint.Style.FILL);
+
+        mLinePaint.setColor(Color.BLACK);
+        mLinePaint.setAntiAlias(true);
+        mLinePaint.setStrokeWidth(1);
+        mLinePaint.setDither(true);
+        mLinePaint.setStyle(Paint.Style.FILL);
     }
 
-
-    private Canvas canvas;
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         this.canvas = canvas;
         canvas.drawColor(backgroundColor);
-        W = canvas.getWidth();
-        H = canvas.getHeight();
-        divider = (MAX_VALUE + 1) - MIN_VALUE;
-        drawLine();
-        drawYAxis();
+        W = getWidth();
+        H = getHeight();
+        divider = MAX_VALUE - MIN_VALUE;
+        drawXYLine();
         drawXAxis();
-        setData();
-        drawAllPoints();
+        drawYAxis();
+        drawXAxisText();
+        drawYAxisText();
+        createPoint();
 
-        ((Activity) context).runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        invalidate();
-
-                        handler.postDelayed(this, 2000);
-                    }
-                }, 2000);
-
-            }
-        });
+        Log.i("DDDDD", "Invalid");
     }
 
-    Handler handler = new Handler();
-    List<Float> plotPoint = new ArrayList<>();
+    public void recreate(){
 
-
-    float PREV;
-    float NEXT;
-
-    private void createPoint() {
-
+        invalidate();
     }
 
-    private void drawAllPoints() {
-        float GAP_H = H / divider;
-        float GAP_W = W / divider;
-        Random rand = new Random();
-        int n = rand.nextInt(Integer.valueOf((int) 30)) + (int) 1;
-        String key = keyOnly.get(n);
-        Float point = data.get(key);
-        Log.i("DDDDDDDDD", "KEY : " + key + " : " + point);
-        plotPoint.add(point);
-
-        for (int i = 0; i < plotPoint.size(); i++) {
-            PREV = plotPoint.get(i);
-            W = W - 2 * GAP_W;
-            canvas.drawLine(GAP_W, PREV, GAP_W, PREV, POINT_PAINT);
-        }
-    }
-
-    private void drawXAxis() {
-        // draw x-axis
-        float EACH_SECTION_H = H / divider;
-        float EACH_SECTION_X = W / divider;
-        float H_X = H - EACH_SECTION_H;
-        canvas.drawLine(0, H_X, W - EACH_SECTION_X, H_X, Y_AXIS_PAINT);
-    }
-
-    private float MIN_VALUE = 100;
-    private float MAX_VALUE = 110;
-
-    private float TIME = 30;
-
-
-    private Map<String, Float> data = new LinkedHashMap<>();
-
-    private List<String> keyOnly = new ArrayList<>();
-
-    private void setData() {
-        DecimalFormat df = new DecimalFormat("#.00");
-        float VALUE_H = H / TIME;
-        float PRICE_KEY = MIN_VALUE;
-        float VALUE_PRICE_VALUE = H - VALUE_H;
-        float IN = (MAX_VALUE - MIN_VALUE) / TIME;
-
-        data.clear();
-        for (int i = 0; i < TIME; i++) {
-            String angleFormated = df.format(PRICE_KEY);
-            data.put(angleFormated, VALUE_PRICE_VALUE);
-            keyOnly.add(angleFormated);
-            PRICE_KEY = PRICE_KEY + IN;
-            VALUE_PRICE_VALUE = VALUE_PRICE_VALUE - VALUE_H;
-        }
-
-        mPricePaint.setColor(Color.BLACK);
-        mPricePaint.setAntiAlias(true);
-        mPricePaint.setTextSize(14);
-        mPricePaint.setStyle(Paint.Style.FILL);
-
-        float EACH_SECTION_H = H / divider;
-        float EACH_SECTION_X = W / divider;
-        float INCREAMENT = (MAX_VALUE - MIN_VALUE) / divider;
-        float Z = MIN_VALUE;
-        float S = H - EACH_SECTION_H;
-        canvas.drawText(df.format(Z), W - EACH_SECTION_X + 3, S + 10, mPricePaint);
-        for (int i = 0; i < divider; i++) {
-            Z = Z + INCREAMENT;
-            S = S - EACH_SECTION_H;
-            canvas.drawText(df.format(Z), W - EACH_SECTION_X + 3, S + 10, mPricePaint);
-        }
-    }
-
-    Paint mPricePaint = new Paint();
-
-    private void drawYAxis() {
-        // draw y-axis
-        float EACH_SECTION_H = H / divider;
-        float EACH_SECTION_X = W / divider;
-
-        float W_Y = W - EACH_SECTION_X;
-        canvas.drawLine(W_Y, 0, W_Y, H - EACH_SECTION_H, Y_AXIS_PAINT);
-
-    }
-
-    private void drawLine() {
+    private void drawXYLine() {
         // Draw equal divider
         if (divider != 0) {
             float EACH_SECTION_H = H / divider;
@@ -203,15 +113,78 @@ public class LineChart extends View {
             float Y = 0;
             for (int i = 0; i < divider; i++) {
                 Y = Y + EACH_SECTION_H;
-                canvas.drawLine(0, Y, W - EACH_SECTION_X, Y, X_PAINT);
+                canvas.drawLine(0, Y, W - EACH_SECTION_X, Y, mXYLinePaint);
             }
             // Draw vertical x-axis
             float X = 0;
             for (int i = 0; i < divider; i++) {
                 X = X + EACH_SECTION_X;
-                canvas.drawLine(X, 0, X, H - EACH_SECTION_H, X_PAINT);
+                canvas.drawLine(X, 0, X, H - EACH_SECTION_H, mXYLinePaint);
             }
-        } else {
         }
     }
+
+    private void drawXAxis() {
+        // draw x-axis
+        float EACH_SECTION_H = H / divider;
+        float EACH_SECTION_X = W / divider;
+        float H_X = H - EACH_SECTION_H;
+        canvas.drawLine(0, H_X, W - EACH_SECTION_X, H_X, mXAxisPaint);
+    }
+
+    private void drawYAxis() {
+        // draw y-axis
+        float EACH_SECTION_H = H / divider;
+        float EACH_SECTION_X = W / divider;
+
+        float W_Y = W - EACH_SECTION_X;
+        canvas.drawLine(W_Y, 0, W_Y, H - EACH_SECTION_H, mYAxisPaint);
+    }
+
+    private void drawXAxisText() {
+        DecimalFormat df = new DecimalFormat("#.00");
+        float EACH_SECTION_H = H / divider;
+        float W_GAP = W / divider;
+        float f = divider;
+        float X = 0;
+        for (int i = 0; i < divider; i++) {
+            canvas.drawText(df.format(f), X, H - EACH_SECTION_H + 20, mXAxisTextPaint);
+            f = f - 1;
+            X = X + W_GAP;
+        }
+    }
+
+    private void drawYAxisText() {
+        DecimalFormat df = new DecimalFormat("#.00");
+        float EACH_SECTION_H = H / divider;
+        float EACH_SECTION_X = W / divider;
+        float INCREAMENT = (MAX_VALUE - MIN_VALUE) / divider;
+        float Z = MIN_VALUE;
+        float S = H - EACH_SECTION_H;
+        canvas.drawText(df.format(Z), W - EACH_SECTION_X + 3, S + 10, mXAxisTextPaint);
+        for (int i = 0; i < divider; i++) {
+            Z = Z + INCREAMENT;
+            S = S - EACH_SECTION_H;
+            canvas.drawText(df.format(Z), W - EACH_SECTION_X + 3, S + 10, mXAxisTextPaint);
+        }
+    }
+
+    private void createPoint() {
+        float EACH_SECTION_H = H / divider;
+        float W_GAP = W / divider;
+        float STARTX = 0;
+        float STARTY = 0;
+        float ENDX = 0;
+        float ENDY;
+        for (int i = 0; i < divider - 1; i++) {
+            Random rand = new Random();
+            float random = EACH_SECTION_H + rand.nextFloat() * (H - 2 * EACH_SECTION_H);
+            ENDX = ENDX + W_GAP;
+            ENDY = random;
+            canvas.drawLine(STARTX, STARTY, ENDX, ENDY, mXAxisPaint);
+            STARTX = ENDX;
+            STARTY = ENDY;
+        }
+    }
+
 }

@@ -12,7 +12,7 @@ import android.view.View;
 import java.text.DecimalFormat;
 import java.util.Random;
 
-public class LineChart extends View {
+public class LineGraph extends View {
 
     private int backgroundColor = Color.LTGRAY;
     private float divider;
@@ -31,19 +31,21 @@ public class LineChart extends View {
     private Paint mXAxisTextPaint = new Paint();
     private Paint mYAxisTextPaint = new Paint();
     private Paint mLinePaint = new Paint();
+    private Paint mLineTwoPointPaint = new Paint();
+    private Paint mXPaint = new Paint();
 
 
-    public LineChart(Context context) {
+    public LineGraph(Context context) {
         super(context);
         init();
     }
 
-    public LineChart(Context context, @Nullable AttributeSet attrs) {
+    public LineGraph(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
-    public LineChart(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public LineGraph(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
     }
@@ -53,6 +55,7 @@ public class LineChart extends View {
         mXYLinePaint.setStrokeWidth(1);
         mXYLinePaint.setAntiAlias(true);
         mXYLinePaint.setDither(true);
+
 
         mXAxisPaint.setColor(Color.RED);
         mXAxisPaint.setStrokeWidth(2);
@@ -81,6 +84,19 @@ public class LineChart extends View {
         mLinePaint.setStrokeWidth(1);
         mLinePaint.setDither(true);
         mLinePaint.setStyle(Paint.Style.FILL);
+
+        mLineTwoPointPaint.setColor(Color.BLACK);
+        mLineTwoPointPaint.setAntiAlias(true);
+        mLineTwoPointPaint.setStrokeWidth(1);
+        mLineTwoPointPaint.setDither(true);
+        mLineTwoPointPaint.setStyle(Paint.Style.FILL);
+
+        mXPaint = new Paint();
+        mXPaint.setAntiAlias(true);
+        mXPaint.setDither(true);
+        mXPaint.setColor(Color.BLACK);
+        mXPaint.setTextSize(21);
+        mXPaint.setStyle(Paint.Style.FILL);
     }
 
 
@@ -163,6 +179,9 @@ public class LineChart extends View {
             f = f - 1;
             X = X + W_GAP;
         }
+
+        canvas.drawText("X-Axis Time(In Sec.)     Y-Axis Price(In Rs.)", W / 2 - 150, H - 10, mXPaint);
+
     }
 
     /**
@@ -198,7 +217,7 @@ public class LineChart extends View {
             float random = EACH_SECTION_H + rand.nextFloat() * (H - 2 * EACH_SECTION_H);
             ENDX = ENDX + W_GAP;
             ENDY = random;
-            canvas.drawLine(STARTX, STARTY, ENDX, ENDY, mXAxisPaint);
+            canvas.drawLine(STARTX, STARTY, ENDX, ENDY, mLinePaint);
             STARTX = ENDX;
             STARTY = ENDY;
         }
